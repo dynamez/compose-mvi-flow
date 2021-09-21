@@ -1,7 +1,14 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    androidApplication
+    kotlinAndroid
+    kotlinKapt
+    daggerHiltAndroid
 }
+
+hilt {
+    enableExperimentalClasspathAggregation = true
+}
+
 android {
     compileSdk = Sdk.COMPILE_SDK_VERSION
 
@@ -9,9 +16,9 @@ android {
         minSdk = Sdk.MIN_SDK_VERSION
         targetSdk = Sdk.TARGET_SDK_VERSION
 
-        applicationId = AppCoordinates.APP_ID
-        versionCode = AppCoordinates.APP_VERSION_CODE
-        versionName = AppCoordinates.APP_VERSION_NAME
+        applicationId = "com.rayout.composemviflow"
+        versionCode = 100000
+            versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
@@ -23,6 +30,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        )
     }
     buildTypes {
         getByName("release") {
@@ -37,21 +48,43 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.1"
+        kotlinCompilerExtensionVersion = Compose.version
     }
 }
 
 dependencies {
+    implementation(
+        fileTree(
+            mapOf(
+                "dir" to "libs",
+                "include" to listOf("*.jar")
+            )
+        )
+    )
+    implementation(uiComponents)
+    implementation(mvi)
+
+    implementationCompose()
+
     implementation(kotlin("stdlib-jdk7"))
-    implementation("androidx.core:core-ktx:1.6.0")
-    implementation(SupportLibs.ANDROIDX_COMPOSE_UI)
-    implementation(SupportLibs.ANDROIDX_COMPOSE_MATERIAL)
-    implementation(SupportLibs.ANDROIDX_COMPOSE_UI_TOOLING)
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
-    implementation("androidx.activity:activity-compose:1.3.1")
+    implementation(Androidx.appCompat)
+    implementation(Androidx.coreKtx)
+
+    implementation(Lifecycle.viewModelKtx)
+    implementation(Lifecycle.runtimeKtx)
+
+    implementation(Androidx.constraintLayout)
+    implementation(Androidx.material)
+
+    implementation(Jetbrains.coroutinesCore)
+
+    implementation(DaggerHilt.android)
+    kapt(DaggerHilt.compiler)
+
+    implementation(Accompanist.coil)
+    implementation(Accompanist.swiperefresh)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation(TestingLib.ANDROIDX_COMPOSE_UI_TESTING)
-    debugImplementation(AndroidTestingLib.ANDROIDX_COMPOSE_UI_TOOLING)
+
 }

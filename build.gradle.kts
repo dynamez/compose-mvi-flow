@@ -1,58 +1,62 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-
-plugins {
-    id("com.android.application") apply false
-    id("com.android.library") apply false
-    kotlin("android") apply false
-    id("io.gitlab.arturbosch.detekt") version BuildPluginsVersion.DETEKT
-    id("org.jlleitschuh.gradle.ktlint") version BuildPluginsVersion.KTLINT
-    id("com.github.ben-manes.versions") version BuildPluginsVersion.VERSIONS_PLUGIN
-    cleanup
+object Plugins {
+    const val AGP = "7.0.2"
+    const val DOKKA = "1.5.0"
+    const val KOTLIN = "1.5.31"
 }
+buildscript {
 
-allprojects {
-    group = PUBLISHING_GROUP
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-eap")
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
+        classpath("com.android.tools.build:gradle:7.0.2")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.5.0")
+        classpath("org.jetbrains.dokka:dokka-core:1.5.0")
+        classpath("com.diffplug.spotless:spotless-plugin-gradle:5.15.1")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.38.1")
     }
 }
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30")
+
+//plugins {
+//    id("com.android.application") apply false
+//    id("com.android.library") apply false
+//    kotlin("android") apply false
+//    id("io.gitlab.arturbosch.detekt") version BuildPluginsVersion.DETEKT
+//    id("org.jlleitschuh.gradle.ktlint") version BuildPluginsVersion.KTLINT
+//    id("com.github.ben-manes.versions") version BuildPluginsVersion.VERSIONS_PLUGIN
+//}
+
+allprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_11.toString()
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+
+            useIR = true
+            // Opt-in to experimental compose APIs
+            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+            // Enable experimental coroutines APIs, including collectAsState()
+            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        }
+    }
+
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-eap")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
 
 subprojects {
     apply {
-        plugin("io.gitlab.arturbosch.detekt")
-        plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("com.github.ben-manes.versions")
         plugin("com.diffplug.spotless")
-    }
-
-    ktlint {
-        debug.set(false)
-        version.set(Versions.KTLINT)
-        verbose.set(true)
-        android.set(false)
-        outputToConsole.set(true)
-        ignoreFailures.set(false)
-        enableExperimentalRules.set(true)
-        filter {
-            exclude("**/generated/**")
-            include("**/kotlin/**")
-        }
-    }
-
-    detekt {
-        config = rootProject.files("config/detekt/detekt.yml")
-        reports {
-            html {
-                enabled = true
-                destination = file("build/reports/detekt.html")
-            }
-        }
     }
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
@@ -100,11 +104,5 @@ subprojects {
 tasks {
     register("clean", Delete::class.java) {
         delete(rootProject.buildDir)
-    }
-
-    withType<DependencyUpdatesTask> {
-        rejectVersionIf {
-            candidate.version.isStableVersion().not()
-        }
     }
 }

@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    androidLib
+    kotlinAndroid
 }
 
 val libraryVersion = "2.1.2"
@@ -14,8 +14,6 @@ android {
     defaultConfig {
         minSdk = 26
         compileSdk = 31
-        versionCode = 201020
-        versionName = "2.1.2"
     }
 
     buildTypes {
@@ -29,8 +27,8 @@ android {
 }
 
 dependencies {
-    implementation(MviDependencies.kotlin)
-    implementation(MviDependencies.coroutinesCore)
-    implementation(MviDependencies.rxJava)
-    implementation(MviDependencies.rxAndroid)
+    implementation(Mvi.kotlin)
+    implementation(Mvi.coroutinesCore)
+    implementation(Mvi.rxJava)
+    implementation(Mvi.rxAndroid)
 }
