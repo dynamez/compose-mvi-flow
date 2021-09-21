@@ -1,4 +1,4 @@
-package com.rayout.composemviflow
+package com.rayout.mvi
 
 import org.junit.Test
 
