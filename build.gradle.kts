@@ -28,6 +28,7 @@ subprojects {
         plugin("io.gitlab.arturbosch.detekt")
         plugin("org.jlleitschuh.gradle.ktlint")
         plugin("com.github.ben-manes.versions")
+        plugin("com.diffplug.spotless")
     }
 
     ktlint {
@@ -51,6 +52,47 @@ subprojects {
                 enabled = true
                 destination = file("build/reports/detekt.html")
             }
+        }
+    }
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("**/*.kt")
+
+            ktlint(Versions.KTLINT).userData(
+                // TODO this should all come from editorconfig https://github.com/diffplug/spotless/issues/142
+                kotlin.collections.mapOf(
+                    "indent_size" to "2",
+                    "kotlin_imports_layout" to "ascii"
+                )
+            )
+
+            trimTrailingWhitespace()
+            indentWithSpaces()
+            endWithNewline()
+        }
+
+        format("xml") {
+            target("**/res/**/*.xml")
+
+            trimTrailingWhitespace()
+            indentWithSpaces()
+            endWithNewline()
+        }
+
+        kotlinGradle {
+            target("**/*.gradle.kts", "*.gradle.kts")
+
+            ktlint(Versions.KTLINT).userData(
+                kotlin.collections.mapOf(
+                    "indent_size" to "2",
+                    "kotlin_imports_layout" to "ascii"
+                )
+            )
+
+            trimTrailingWhitespace()
+            indentWithSpaces()
+            endWithNewline()
         }
     }
 }

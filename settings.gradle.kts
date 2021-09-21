@@ -17,8 +17,6 @@ pluginManagement {
 }
 rootProject.name = ("compose-mvi-flow")
 include(
-
-    "app"
+    "app",
+    "mvi"
 )
-
-include(":mvi")

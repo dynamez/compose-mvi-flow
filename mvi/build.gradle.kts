@@ -1,42 +1,36 @@
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    id("com.android.application")
+    kotlin("android")
 }
 
+val libraryVersion = "2.1.2"
+val libraryVersionCode = 6
+val packageName = "com.rayout.mvi"
+val libraryName = project.name
+val releasePath = "$buildDir/outputs/aar/$libraryName-release.aar"
+
 android {
-    compileSdk 31
 
     defaultConfig {
-        minSdk 26
-        targetSdk 31
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
+        minSdk = 26
+        compileSdk = 31
+        versionCode = 201020
+        versionName = "2.1.2"
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            )
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation(MviDependencies.kotlin)
+    implementation(MviDependencies.coroutinesCore)
+    implementation(MviDependencies.rxJava)
+    implementation(MviDependencies.rxAndroid)
 }
